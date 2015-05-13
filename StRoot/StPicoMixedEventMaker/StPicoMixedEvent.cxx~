@@ -1,0 +1,12 @@
+#include "StPicoDstMaker/StPicoEvent.h"
+#include "StPicoMixedEvent.h"
+
+//ClassImp(StPicoMixedEvent)
+
+StPicoMixedEvent::StPicoMixedEvent()
+{}
+
+void StPicoMixedEvent::AddPicoEvent(StPicoEvent* picoEvent)
+{
+  return;
+}
