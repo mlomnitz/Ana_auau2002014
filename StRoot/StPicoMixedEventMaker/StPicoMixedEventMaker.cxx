@@ -112,7 +112,7 @@ Int_t StPicoMixedEventMaker::Make(){
   }
   
   mPicoEvent = picoDst->event();
-  mPicoMixedEvent -> AddPicoEvent(mPicoEvent);
+  mPicoMixedEvent -> addPicoEvent(mPicoEvent);
   
   mTree->Fill();
 
