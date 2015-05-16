@@ -60,9 +60,43 @@ void StPicoEventMixer::addPicoTrack(StMixerEvent a, StPicoTrack const * picoTrac
   return;
 }
 void StPicoEventMixer::mixEvents(){
-  //Should this go here?
   short int const nEvent = mEvents.size();
+  int const nTracksEvt1 = mEvents.at(0).getNoTracks();
 
-      
+  for( int iEvt2 = 1; iEvt2 < nEvent; iEvt2++){
+    int const nTracksEvt2 = mEvents.at(iEvt2).getNoTracks();
+
+    for( int iTrk1 = 0; iTrk1 < nTracksEvt1; iTrk1++){
+      for( int iTrk2 = 0; iTrk2 < nTracksEvt2; iTrk2++){
+	StMixerTrack *pion = mEvents.at(0).trackAt(iTrk1);
+	StMixerTrack *kaon = mEvents.at(iEvt2).trackAt(iTrk2);
+	//Select pions from first event
+	if( !isPion(mEvents.at(0).trackAt(iTrk1)) ) continue;
+	//Select Kaons from other events
+	if ( !isKaon(mEvents.at(iEvt2).trackAt(iTrk2)) ) continue;
+	//Lomnitz make pair here
+	
+      } //second event track loop
+    } //first event track loop 
+  } //loop over second events
+  mEvents.erase(mEvents.begin());
+  //mEvents.erase(mEvents.begin());
   return;
+}
+bool StPicoEventMixer::isPion(StMixerTrack track){
+  short info = track.getTrackInfo();
+  //TPC pion
+  if( (info & 2) >> 1 != 1) return false;
+  //TOF pion
+  if( (info & 4) >> 2 != 1) return false;
+  return true;
+}
+
+bool StPicoEventMixer::isKaon(StMixerTrack track){
+  short info = track.getTrackInfo();
+  //TPC Kaon
+  if( (info & 8) >> 3 != 1) return false;
+  //TOF Kaon
+  if( (info & 16) >> 4 != 1) return false;
+  return true;
 }

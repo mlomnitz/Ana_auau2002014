@@ -14,6 +14,8 @@ class StMixerEvent{
   void setPos( float const, float const, float const);
   void setField( float const );
   void setNoTracks( int const );
+  int getNoTracks();
+  StMixerTrack * trackAt(int const); 
  private:
   int mNoTracks;
   float mBField;
@@ -25,6 +27,6 @@ inline void StMixerEvent::setPos( float const vx, float const vy, float const vz
 }
 inline void StMixerEvent::setField( float const field ){ mBField = field; }
 inline void StMixerEvent::setNoTracks( int const noTracks ){ mNoTracks = noTracks; }
-
-
+inline int StMixerEvent::getNoTracks(){ return mEventTracks.size(); }
+inline StMixerTrack * StMixerEvent::trackAt(int const counter) { return(mEventTracks.at(counter));} 
 #endif

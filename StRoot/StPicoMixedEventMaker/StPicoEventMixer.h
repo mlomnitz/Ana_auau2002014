@@ -25,6 +25,9 @@ class StPicoEventMixer {
  private:
   void InitMixedEvent();
   void FinishMixedEvent();
+  bool isPion(StMixerTrack);
+  bool isKaon(StMixerTrack);
+  
   unsigned short int mEventsBuffer; //Nevents in buffers
   unsigned short int filledBuffer;
   std::vector < StMixerEvent > mEvents; //Needs to be generalized to more categories Using TCLones array
@@ -32,4 +35,6 @@ class StPicoEventMixer {
 };
 
 inline void StPicoEventMixer::setEventBuffer(Int_t buffer){ mEventsBuffer = buffer;}
+			    
+    
 #endif
