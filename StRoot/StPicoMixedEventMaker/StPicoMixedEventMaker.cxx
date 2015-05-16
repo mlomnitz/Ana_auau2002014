@@ -1,5 +1,3 @@
-#include <vector>
-
 #include "TTree.h"
 #include "TFile.h"
 #include "TChain.h"
@@ -14,15 +12,17 @@
 #include "StPicoPrescales/StPicoPrescales.h"
 
 #include "StPicoMixedEventMaker.h"
-#include "StPicoMixedEvent.h"
+#include "StPicoEventMixer.h"
+
+#include <vector>
 
 ClassImp(StPicoMixedEventMaker)
 
 // _________________________________________________________
 StPicoMixedEventMaker::StPicoMixedEventMaker(char const* name, StPicoDstMaker* picoMaker, 
 		    		     char const* outputBaseFileName,  char const* inputHFListHFtree = "") :
-  StMaker(name), mPicoDst(NULL), mPicoDstMaker(picoMaker), 
-  mPicoEvent(NULL), mPicoMixedEvent(NULL),
+StMaker(name), mPicoDst(NULL), mPicoDstMaker(picoMaker),  mPicoEvent(NULL),
+  mPicoEventMixer(NULL),
   mOuputFileBaseName(outputBaseFileName), mInputFileName(inputHFListHFtree),
   mTree(NULL), mRunId(0), mEventCounter(0), 
   mOutputFileTree(NULL){
@@ -32,6 +32,7 @@ StPicoMixedEventMaker::StPicoMixedEventMaker(char const* name, StPicoDstMaker* p
 
 // _________________________________________________________
 StPicoMixedEventMaker::~StPicoMixedEventMaker() {
+  ;
 }
 // Method should load Q vector stuff from Hao, needs fixing
 // _________________________________________________________
@@ -54,7 +55,7 @@ Int_t StPicoMixedEventMaker::Init() {
     mTree = new TTree("T", "T", BufSize);
   mTree->SetAutoSave(1000000); // autosave every 1 Mbytes
 
-  mTree->Branch("mixedEvent", "StPicoMixedEvent", &mPicoMixedEvent, BufSize, Split);
+  mTree->Branch("mixedEvent", "StPicoMixedEvent", &mPicoEventMixer, BufSize, Split);
  
   // -- disable automatic adding of objects to file
   bool oldStatus = TH1::AddDirectoryStatus();
@@ -111,8 +112,7 @@ Int_t StPicoMixedEventMaker::Make(){
     return kStWarn;
   }
   
-  mPicoEvent = picoDst->event();
-  mPicoMixedEvent -> addPicoEvent(mPicoEvent);
+  mPicoEventMixer -> addPicoEvent(picoDst);
   
   mTree->Fill();
 

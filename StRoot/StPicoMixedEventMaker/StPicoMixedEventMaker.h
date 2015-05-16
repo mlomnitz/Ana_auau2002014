@@ -27,7 +27,7 @@ class StPicoDst;
 class StPicoDstMaker;
 class StPicoEvent;
 class StPicoTrack;
-class StPicoMixedEvent;
+class StPicoEventMixer;
 
 class StPicoMixedEventMaker : public StMaker 
 {
@@ -50,7 +50,7 @@ class StPicoMixedEventMaker : public StMaker
     StPicoDst      *mPicoDst;
     StPicoDstMaker* mPicoDstMaker;      // ptr to picoDst maker
     StPicoEvent*    mPicoEvent;         // ptr to picoDstEvent
-    StPicoMixedEvent* mPicoMixedEvent;
+    StPicoEventMixer* mPicoEventMixer;
 
     TString         mOuputFileBaseName; // base name for output files
     TString         mInputFileName;     // filename of input list of HF trees (needs to be in the 
