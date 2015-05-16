@@ -1,12 +1,11 @@
 #include "StMixerTrack.h"
+#include "StThreeVectorF.hh"
 #include <limits>
 
-StMixerTrack::StMixerTrack() : mTrackInfo(std::numeric_limits<short>::min()), mMomX(std::numeric_limits<float>::max()),
-			      mMomY(std::numeric_limits<float>::max()), mMomZ(std::numeric_limits<float>::max())
+StMixerTrack::StMixerTrack() : mTrackInfo(std::numeric_limits<short>::min()), mMom(StThreeVectorF())
 {
 }
-StMixerTrack::StMixerTrack(StMixerTrack const * t) : mTrackInfo(t->mTrackInfo), mMomX(t->mMomX),
-			      mMomY(t->mMomY), mMomZ(t->mMomZ)
+StMixerTrack::StMixerTrack(StMixerTrack const * t) : mTrackInfo(t->mTrackInfo), mMom(t->mMom)
 {
 }
 void StMixerTrack::setTrackInfo(bool charge, bool isTpcPi, bool isTofPi, bool isTpcK, bool isTofK)
@@ -21,8 +20,9 @@ void StMixerTrack::setTrackInfo(bool charge, bool isTpcPi, bool isTofPi, bool is
   
 }
 void StMixerTrack::setTrackMom(float const px, float const py, float const pz){
-  mMomX = px;
-  mMomY = py;
-  mMomZ = pz;
+  StThreeVectorF p(px, py, pz);
+  mMom = p;
 }
-
+void StMixerTrack::setTrackMom(StThreeVectorF const & p ){
+  mMom = p;
+}
