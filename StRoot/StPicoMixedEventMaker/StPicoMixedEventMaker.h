@@ -5,13 +5,16 @@
 
 /* **************************************************
  *  Base class for Mixed Event cosntructions
- *  details to come
+ *  
+ *  - Usage: Implement specific decay in daughter, i.e. 2 or three body decay
+ * 
+ *  - Methods from StHFCyts utility class can/should be used
  *
  * **************************************************
  *
  *  Initial Authors:
  *            Michael Lomnitz  (mrlomnitz@lbl.gov)
- *            Mustaga Mustafa  (mmustafa@lbl.gov) 
+ *            Mustaga Mustafa  (mmustafa@lbl.gov)
  *
  *  ** Code Maintainer
  * 
@@ -19,7 +22,7 @@
  * **************************************************  
  */
 
-class TTree;
+class TTree; //Need tod ecide if will be saving TTree, NTuple or histos
 class TFile;
 class TChain;
 
@@ -35,35 +38,29 @@ class StPicoMixedEventMaker : public StMaker
     StPicoMixedEventMaker(char const* name, StPicoDstMaker* picoMaker, char const* outputBaseFileName,  
 		       char const* inputHFListHFtree);
     virtual ~StPicoMixedEventMaker();
+    virtual Int_t Init();
+    virtual Int_t Make();
+    virtual Int_t Finish();
+    virtual void  Clear(Option_t *opt="");
     Int_t SetCategories();
  private:
-    // -- Inhertited from StMaker 
-    //    NOT TO BE OVERWRITTEN by daughter class
-    //    daughter class should implement xxxHF()
-    Int_t Init();
-    Int_t Make();
-    bool LoadEventPlaneCorr(Int_t const run);
-    void  Clear(Option_t *opt="");
-    Int_t Finish();
-
-    // -- private members  ------------------------
     StPicoDst      *mPicoDst;
-    StPicoDstMaker* mPicoDstMaker;      // ptr to picoDst maker
-    StPicoEvent*    mPicoEvent;         // ptr to picoDstEvent
-    StPicoEventMixer* mPicoEventMixer;
+    StPicoDstMaker* mPicoDstMaker;      
+    StPicoEvent*    mPicoEvent;         
+    StPicoEventMixer* mPicoEventMixer; //Needs to be generalized to have mixer per category bin
 
-    TString         mOuputFileBaseName; // base name for output files
-    TString         mInputFileName;     // filename of input list of HF trees (needs to be in the 
-                                        // same order as the picoDstList    
-    TTree*          mTree;              // tree holding "mPicoHFEvent" for writing only
+    TString         mOuputFileBaseName; 
+    TString         mInputFileName;     
 
     int             mRunId;
-    int             mEventCounter;      // n Processed events in chain
+    int             mEventCounter;
 
-    TFile*          mOutputFileTree;    // ptr to file saving the HFtree
-    //TFile*          mOutputFileList;    // ptr to file saving the list of histograms
-    // Vector of vectors to save categories
-    //vector<TObject *> mCategories;
+    bool LoadEventPlaneCorr(Int_t const run);
+                                        
+    TTree*          mTree;
+
+    TFile*          mOutputFileTree; 
+
     ClassDef(StPicoMixedEventMaker, 1)
 };
 #endif

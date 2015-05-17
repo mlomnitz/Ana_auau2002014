@@ -1,23 +1,42 @@
 #ifndef StMixerTrack_hh
 #define StMixerTrack_hh
-
+/* **************************************************
+ *
+ * Track class used for mixed event buffer, stripped down 
+ * to minimum information neede to reconstruct the helix
+ * and basic track information. Currently include:
+ * 1) charge
+ * 2) isTpcPi & isTofPi
+ * 3) isTpcKaon & is TofKaon
+ *
+ * **************************************************
+ *
+ *  Initial Authors:  
+ *         ** Michael Lomnitz (mrlomnitz@lbl.gov)
+ *            Mustafa Mustafa (mmustafa@lbl.gov)
+ *
+ *  ** Code Maintainer
+ *
+ * **************************************************
+ */
 #include <math.h>
+
 #include "StThreeVectorF.hh"
+
+class StPicoTrack;
 
 class StMixerTrack{
  public:
   StMixerTrack();
   StMixerTrack(StMixerTrack const *);
-  void setTrackInfo(bool const, bool const, bool const, bool const, bool const);
-  void setTrackMom(float const , float const , float const);
-  void setTrackMom(StThreeVectorF const & );
+  StMixerTrack(StPicoTrack const *, bool, bool, bool, bool);
   short const getTrackInfo() const;
   int const charge() const ;
   StThreeVectorF const &gMom() const;
   ~StMixerTrack(){;};
  private:
-  short mTrackInfo;
   StThreeVectorF mMom;
+  short mTrackInfo;
   //Removed origin, allt racks shoud me set to 0,0,0
 };
 inline short const StMixerTrack::getTrackInfo() const { return(mTrackInfo); }

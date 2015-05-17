@@ -3,7 +3,6 @@
 #include "TChain.h"
 
 #include "StThreeVectorF.hh"
-#include "StLorentzVectorF.hh"
 #include "StPicoDstMaker/StPicoDst.h"
 #include "StPicoDstMaker/StPicoDstMaker.h"
 #include "StPicoDstMaker/StPicoEvent.h"
@@ -24,8 +23,8 @@ StPicoMixedEventMaker::StPicoMixedEventMaker(char const* name, StPicoDstMaker* p
 StMaker(name), mPicoDst(NULL), mPicoDstMaker(picoMaker),  mPicoEvent(NULL),
   mPicoEventMixer(NULL),
   mOuputFileBaseName(outputBaseFileName), mInputFileName(inputHFListHFtree),
-  mTree(NULL), mRunId(0), mEventCounter(0), 
-  mOutputFileTree(NULL){
+  mRunId(0), mEventCounter(0), 
+  mTree(NULL), mOutputFileTree(NULL){
   
   // -- constructor
 }

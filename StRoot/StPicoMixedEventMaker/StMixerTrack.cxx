@@ -1,28 +1,26 @@
 #include "StMixerTrack.h"
+#include "StPicoDstMaker/StPicoTrack.h"
 #include "StThreeVectorF.hh"
 #include <limits>
 
-StMixerTrack::StMixerTrack() : mTrackInfo(std::numeric_limits<short>::min()), mMom(StThreeVectorF())
+StMixerTrack::StMixerTrack() : mMom(StThreeVectorF()), mTrackInfo(std::numeric_limits<short>::min())
 {
 }
-StMixerTrack::StMixerTrack(StMixerTrack const * t) : mTrackInfo(t->mTrackInfo), mMom(t->mMom)
+StMixerTrack::StMixerTrack(StPicoTrack const *picoTrack, bool isTpcPi, bool isTofPi, bool isTpcK, bool isTofK) : mMom(StThreeVectorF()), mTrackInfo(std::numeric_limits<short>::min())
 {
-}
-void StMixerTrack::setTrackInfo(bool charge, bool isTpcPi, bool isTofPi, bool isTpcK, bool isTofK)
-{
-  if( charge == true ) mTrackInfo = mTrackInfo | (1 << 1);
+
+  mMom = picoTrack->gMom();
+
+  if( picoTrack->charge() > 0 ) mTrackInfo = mTrackInfo | (1 << 1);
   //Pi
   if( isTpcPi == true ) mTrackInfo = mTrackInfo | (1 << 2);
   if( isTofPi == true ) mTrackInfo = mTrackInfo | (1 << 3);
   //K
   if( isTpcK == true ) mTrackInfo = mTrackInfo | (1 << 4);
   if( isTofK == true ) mTrackInfo = mTrackInfo | (1 << 5);
-  
+
 }
-void StMixerTrack::setTrackMom(float const px, float const py, float const pz){
-  StThreeVectorF p(px, py, pz);
-  mMom = p;
+StMixerTrack::StMixerTrack(StMixerTrack const * t) : mMom(t->mMom), mTrackInfo(t->mTrackInfo)
+{
 }
-void StMixerTrack::setTrackMom(StThreeVectorF const & p ){
-  mMom = p;
-}
+

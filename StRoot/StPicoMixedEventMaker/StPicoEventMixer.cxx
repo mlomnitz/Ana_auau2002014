@@ -2,14 +2,13 @@
 #include "StPicoDstMaker/StPicoEvent.h"
 #include "StPicoDstMaker/StPicoTrack.h"
 #include "StPicoDstMaker/StPicoDst.h"
-#include "StMixedEventTriplet.h"
 #include "StMixerTrack.h"
 #include "StMixerEvent.h"
+#include "StMixerPair.h"
+#include "StMixerTriplet.h"
 #include <vector>
 
-ClassImp(StPicoEventMixer)
-
-StPicoEventMixer::StPicoEventMixer(): mEventsBuffer(std::numeric_limits<int>::min()), filledBuffer(0),mEvents(0)
+StPicoEventMixer::StPicoEventMixer(): mEvents(0), mEventsBuffer(std::numeric_limits<int>::min()), filledBuffer(0)
 {
   InitMixedEvent();
   return;
@@ -23,7 +22,6 @@ void StPicoEventMixer::FinishMixedEvent(){
 }
 bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst)
 {
-  //Should also set categories, still pending
   StMixerEvent Event;
   StPicoEvent * picoEvent = picoDst->event();
   int nTracks = picoEvent->numberOfGlobalTracks();
@@ -47,15 +45,11 @@ bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst)
 }  
 void StPicoEventMixer::addPicoTrack(StMixerEvent a, StPicoTrack const * picoTrack)
 {
-  StThreeVectorF p = picoTrack -> gMom();
-  StMixerTrack *metrk = new StMixerTrack();
-  metrk->setTrackMom(p.x(), p.y(), p.z());
-  //Lomnitz :: Get track TOF, TPC and charge 
-  bool isTpcPi = 0;
-  bool isTofPi = 0;
-  bool isTpcK = 0;
-  bool isTofK = 0;
-  metrk->setTrackInfo(picoTrack->charge(), isTpcPi, isTofPi, isTpcK, isTofK);
+  bool isTpcPi = false;
+  bool isTofPi = false;
+  bool isTpcK = false;
+  bool isTofK = false;
+  StMixerTrack *metrk = new StMixerTrack(picoTrack, isTpcPi, isTofPi, isTpcK, isTofK);
   a.addTrack(metrk);
   return;
 }

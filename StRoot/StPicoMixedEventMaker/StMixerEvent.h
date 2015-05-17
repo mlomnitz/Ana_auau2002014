@@ -3,6 +3,26 @@
 #include <math.h>
 #include <vector>
 
+/* **************************************************
+ *
+ * Event class used for mixed event buffer, stripped down 
+ * to minimum information neede to reconstruct the helix
+ * and basic track information. Currently include:
+ * 1) primVtx
+ * 2) B-Field
+ * 3) MixerTrack array
+ *
+ * **************************************************
+ *
+ *  Initial Authors:  
+ *         ** Michael Lomnitz (mrlomnitz@lbl.gov)
+ *            Mustafa Mustafa (mmustafa@lbl.gov)
+ *
+ *  ** Code Maintainer
+ *
+ * **************************************************
+ */
+
 class StMixerTrack;
 
 class StMixerEvent{
@@ -17,10 +37,10 @@ class StMixerEvent{
   int getNoTracks();
   StMixerTrack * trackAt(int const); 
  private:
-  int mNoTracks;
   float mBField;
   float mVx, mVy, mVz;
   std::vector <StMixerTrack * > mEventTracks;
+  int mNoTracks;
 };
 inline void StMixerEvent::setPos( float const vx, float const vy, float const vz){
   mVx = vx; mVy = vy; mVz = vz;
