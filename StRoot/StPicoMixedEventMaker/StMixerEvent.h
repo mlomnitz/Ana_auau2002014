@@ -2,7 +2,7 @@
 #define StMixerEvent_hh
 #include <math.h>
 #include <vector>
-
+#include "StThreeVectorF.hh"
 /* **************************************************
  *
  * Event class used for mixed event buffer, stripped down 
@@ -36,17 +36,21 @@ class StMixerEvent{
   void setNoTracks( int const );
   int getNoTracks();
   StMixerTrack * trackAt(int const); 
+  StThreeVectorF const & vertex() const;
+  double const field() const;
  private:
-  float mBField;
-  float mVx, mVy, mVz;
+  StThreeVectorF mVtx;
   std::vector <StMixerTrack * > mEventTracks;
+  float mBField;
   int mNoTracks;
 };
 inline void StMixerEvent::setPos( float const vx, float const vy, float const vz){
-  mVx = vx; mVy = vy; mVz = vz;
+  mVtx = StThreeVectorF(vx, vy, vz);
 }
 inline void StMixerEvent::setField( float const field ){ mBField = field; }
 inline void StMixerEvent::setNoTracks( int const noTracks ){ mNoTracks = noTracks; }
 inline int StMixerEvent::getNoTracks(){ return mEventTracks.size(); }
 inline StMixerTrack * StMixerEvent::trackAt(int const counter) { return(mEventTracks.at(counter));} 
+inline StThreeVectorF const & StMixerEvent::vertex() const { return mVtx; }
+inline double const StMixerEvent::field() const {return mBField; }
 #endif
