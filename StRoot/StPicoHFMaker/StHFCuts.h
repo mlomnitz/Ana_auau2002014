@@ -33,6 +33,9 @@ class StPicoDst;
 class StHFPair;
 class StHFTriplet;
 
+class StMixerPair;
+class StMixerTriplet;
+
 class StHFCuts : public TNamed
 {
  public:
@@ -111,6 +114,13 @@ class StHFCuts : public TNamed
 
   // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --   
   
+  //  Event Mixer Cuts 
+
+  bool isGoodMixerPair(StMixerPair const & pair) const;
+  bool isGoodMixerTriplet(StMixerTriplet const & triplet) const;
+
+  // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --   
+
   const unsigned int&  eventStatMax()  const { return mEventStatMax; }
 
   // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --   

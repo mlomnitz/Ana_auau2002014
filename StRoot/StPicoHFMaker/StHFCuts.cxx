@@ -21,6 +21,9 @@
 #include "StHFPair.h"
 #include "StHFTriplet.h"
 
+#include "StPicoMixedEventMaker/StMixerPair.h"
+#include "StPicoMixedEventMaker/StMixerTriplet.h"
+
 ClassImp(StHFCuts)
 
 // _________________________________________________________
@@ -345,6 +348,27 @@ bool StHFCuts::isGoodSecondaryVertexTriplet(StHFTriplet const & triplet) const {
 }
 
 // =======================================================================
+// Mixer cuts
+bool StHFCuts::isGoodMixerPair(StMixerPair const & pair) const {
+  // -- check for good secondary vertex pair
+
+  return ( pair.m() > mSecondaryPairMassMin && pair.m() < mSecondaryPairMassMax &&
+	   std::cos(pair.pointingAngle()) > mSecondaryPairCosThetaMin &&
+	   pair.decayLength() > mSecondaryPairDecayLengthMin && pair.decayLength() < mSecondaryPairDecayLengthMax &&
+	   pair.dcaDaughters() < mSecondaryPairDcaDaughtersMax);
+}
+
+// _________________________________________________________
+bool StHFCuts::isGoodMixerTriplet(StMixerTriplet const & triplet) const {
+  // -- check for good secondary vertex triplet
+
+  return ( triplet.m() > mSecondaryTripletMassMin && triplet.m() < mSecondaryTripletMassMax &&
+	   std::cos(triplet.pointingAngle()) > mSecondaryTripletCosThetaMin &&
+	   triplet.decayLength() > mSecondaryTripletDecayLengthMin && triplet.decayLength() < mSecondaryTripletDecayLengthMax &&
+	   triplet.dcaDaughters12() < mSecondaryTripletDcaDaughters12Max &&
+	   triplet.dcaDaughters23() < mSecondaryTripletDcaDaughters23Max &&
+	   triplet.dcaDaughters31() < mSecondaryTripletDcaDaughters31Max);
+}
 
 // _________________________________________________________
 float StHFCuts::getTofBetaBase(StPicoTrack const * const trk) const {
