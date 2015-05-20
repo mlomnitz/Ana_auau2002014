@@ -25,6 +25,17 @@ StMaker(name), mPicoDst(NULL), mPicoDstMaker(picoMaker),  mPicoEvent(NULL),
   mOuputFileBaseName(outputBaseFileName), mInputFileName(inputHFListHFtree),
   mRunId(0), mEventCounter(0), 
   mTree(NULL), mOutputFileTree(NULL){
+
+  mOutputFileTree = new TFile(Form("%s.picoMEtree.root", mOuputFileBaseName.Data()), "RECREATE");
+  mOutputFileTree->SetCompressionLevel(1);
+  mOutputFileTree->cd();
+  // -- create OutputTree
+  int BufSize = (int)pow(2., 16.);
+  int Split = 1;
+  if (!mTree) 
+    mTree = new TTree("T", "T", BufSize);
+  mTree->SetAutoSave(1000000); // autosave every 1 Mbytes
+  //  mTree->Branch("mixedEvent", "StPicoMixedEvent", &mPicoEventMixer, BufSize, Split);
   
   // -- constructor
 }
@@ -41,35 +52,10 @@ bool StPicoMixedEventMaker::LoadEventPlaneCorr(Int_t const run){
 }
 // _________________________________________________________
 Int_t StPicoMixedEventMaker::Init() {
-  // Setting output file 
-  //mOutputFileList->SetCompressionLevel(1);
-  mOutputFileTree = new TFile(Form("%s.picoMEtree.root", mOuputFileBaseName.Data()), "RECREATE");
-  mOutputFileTree->SetCompressionLevel(1);
-  mOutputFileTree->cd();
-  
-  // -- create OutputTree
-  int BufSize = (int)pow(2., 16.);
-  int Split = 1;
-  if (!mTree) 
-    mTree = new TTree("T", "T", BufSize);
-  mTree->SetAutoSave(1000000); // autosave every 1 Mbytes
 
-  mTree->Branch("mixedEvent", "StPicoMixedEvent", &mPicoEventMixer, BufSize, Split);
- 
-  // -- disable automatic adding of objects to file
-  bool oldStatus = TH1::AddDirectoryStatus();
-  TH1::AddDirectory(false);
-  
-  /* -- add list which holds all histograms  
-  mOutputFileList = new TList();
-  mOutputFileList->SetName(GetName());
-  mOutputFileList->SetOwner(true);
-  */
-  TH1::AddDirectory(oldStatus);
-  // Load associated EventPLane calculations
   if(!LoadEventPlaneCorr(mRunId)){
     LOG_WARN << "Event plane calculations unavalable! Skipping"<<endm;
-    return kStWarn;
+    return kStOk;
   }
   
   // -- reset event to be in a defined state
