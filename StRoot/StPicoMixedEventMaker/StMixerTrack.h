@@ -33,14 +33,17 @@ class StMixerTrack{
   short const getTrackInfo() const;
   int const charge() const ;
   StThreeVectorF const &gMom() const;
+  StThreeVectorF const &origin() const;
   ~StMixerTrack(){;};
  private:
+  StThreeVectorF mOrigin;
   StThreeVectorF mMom;
   short mTrackInfo;
   //Removed origin, allt racks shoud me set to 0,0,0
 };
 inline short const StMixerTrack::getTrackInfo() const { return(mTrackInfo); }
 inline StThreeVectorF const & StMixerTrack::gMom() const { return(mMom) ;}
+inline StThreeVectorF const & StMixerTrack::origin() const { return(mOrigin) ;}
 inline int const StMixerTrack::charge() const { 
   int temp = (mTrackInfo & 1);
   if(temp ==1) return 1;
