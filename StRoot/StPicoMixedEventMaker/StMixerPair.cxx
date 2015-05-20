@@ -41,10 +41,8 @@ StMixerPair::StMixerPair(StMixerTrack const * const particle1, StMixerTrack cons
   mParticle1Mom = particle1->gMom();
   mParticle2Mom = particle2->gMom();
 
-  StThreeVectorF const origin(0.0 ,0.0 , 0.0);
-  
-  StPhysicalHelixD p1Helix(particle1->gMom(), origin, particle1->charge(), bField); 
-  StPhysicalHelixD p2Helix(particle2->gMom(), origin, particle2->charge(), bField); 
+  StPhysicalHelixD p1Helix(particle1->gMom(), particle1->origin(), particle1->charge(), bField); 
+  StPhysicalHelixD p2Helix(particle2->gMom(), particle2->origin(), particle2->charge(), bField); 
 
   // -- move origins of helices to the primary vertex origin
   p1Helix.moveOrigin(p1Helix.pathLength(vtx));

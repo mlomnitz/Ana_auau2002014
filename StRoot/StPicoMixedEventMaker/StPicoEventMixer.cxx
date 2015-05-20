@@ -2,6 +2,9 @@
 #include "StPicoDstMaker/StPicoEvent.h"
 #include "StPicoDstMaker/StPicoTrack.h"
 #include "StPicoDstMaker/StPicoDst.h"
+
+#include "StPicoHFMaker/StHFCuts.h"
+
 #include "StMixerTrack.h"
 #include "StMixerEvent.h"
 #include "StMixerPair.h"
@@ -63,13 +66,15 @@ void StPicoEventMixer::mixEvents(){
     for( int iTrk1 = 0; iTrk1 < nTracksEvt1; iTrk1++){
       for( int iTrk2 = 0; iTrk2 < nTracksEvt2; iTrk2++){
 	StMixerTrack *pion = mEvents.at(0).trackAt(iTrk1);
-	StMixerTrack *kaon = mEvents.at(iEvt2).trackAt(iTrk2);
 	//Select pions from first event
 	if( !isPion(mEvents.at(0).trackAt(iTrk1)) ) continue;
+	StMixerTrack *kaon = mEvents.at(iEvt2).trackAt(iTrk2);
 	//Select Kaons from other events
 	if ( !isKaon(mEvents.at(iEvt2).trackAt(iTrk2)) ) continue;
-	//Lomnitz make pair here
-	
+	StMixerPair *pair = new StMixerPair(mEvents.at(0).trackAt(iTrk1), mEvents.at(iEvt2).trackAt(iTrk2),
+					    StHFCuts::kPion, StHFCuts::kPion,
+					    mEvents.at(0).vertex(), mEvents.at(0).field() );
+	//And now? Need to determine what and how it is going to be saved
       } //second event track loop
     } //first event track loop 
   } //loop over second events

@@ -28,6 +28,7 @@ class StPicoTrack;
 class StPicoDst;
 class StMixerTrack;
 class StMixerEvent;
+class StHFCuts;
 
 class StPicoEventMixer {
  public: 
