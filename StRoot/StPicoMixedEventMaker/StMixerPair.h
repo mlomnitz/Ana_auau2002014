@@ -40,7 +40,8 @@ class StMixerPair
 
   StMixerPair(StMixerTrack const * particle1, StMixerTrack const * particle2, 
 	   float p1MassHypo, float p2MassHypo,
-	   StThreeVectorF const & vtx, float bField);
+	   StThreeVectorF const & vtx1, StThreeVectorF const & vtx2,
+	   float bField);
 
   //Need to implement situation when we will have 2 2body decays, i.e. Lambda_c
 

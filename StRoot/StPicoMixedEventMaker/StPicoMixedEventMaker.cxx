@@ -113,7 +113,7 @@ Int_t StPicoMixedEventMaker::Make(){
   
   mPicoEventMixer -> addPicoEvent(picoDst);
   
-  mTree->Fill();
+  //mTree->Fill();
 
   return kStOk;
 }
@@ -121,3 +121,10 @@ Int_t StPicoMixedEventMaker::Make(){
 Int_t StPicoMixedEventMaker::SetCategories(){
   return kStOk;
 }    
+// _________________________________________________________
+int StPicoMixedEventMaker::categorize(StPicoDst const * picoDst ){
+  StThreeVectorF pVertex = (picoDst->event())->primaryVertex();
+  if( fabs(pVertex.z())>6.0 ) return -99;
+  int bin = -6.0 + (pVertex.z()+6.0)/1.2;
+  return bin;
+}

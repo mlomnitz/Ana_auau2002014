@@ -27,11 +27,11 @@ StMixerPair::StMixerPair(StMixerPair const * t) : mLorentzVector(t->mLorentzVect
 // _________________________________________________________
 StMixerPair::StMixerPair(StMixerTrack const * const particle1, StMixerTrack const * const particle2,
 		   float p1MassHypo, float p2MassHypo, 
-		   StThreeVectorF const & vtx, float const bField) :  mLorentzVector(StLorentzVectorF()), mDecayVertex(StThreeVectorF()),
-  mPointingAngle(std::numeric_limits<float>::quiet_NaN()), mDecayLength(std::numeric_limits<float>::quiet_NaN()),
-  mParticle1Dca(std::numeric_limits<float>::quiet_NaN()), mParticle2Dca(std::numeric_limits<float>::quiet_NaN()),
-  mParticle1Mom(StThreeVectorF()), mParticle2Mom(StThreeVectorF()),
-  mDcaDaughters(std::numeric_limits<float>::max()), mCosThetaStar(std::numeric_limits<float>::quiet_NaN()) {
+		   StThreeVectorF const & vtx1, StThreeVectorF const & vtx2, float const bField) :  mLorentzVector(StLorentzVectorF()), mDecayVertex(StThreeVectorF()),
+                   mPointingAngle(std::numeric_limits<float>::quiet_NaN()), mDecayLength(std::numeric_limits<float>::quiet_NaN()),
+                   mParticle1Dca(std::numeric_limits<float>::quiet_NaN()), mParticle2Dca(std::numeric_limits<float>::quiet_NaN()),
+		   mParticle1Mom(StThreeVectorF()), mParticle2Mom(StThreeVectorF()),
+                   mDcaDaughters(std::numeric_limits<float>::max()), mCosThetaStar(std::numeric_limits<float>::quiet_NaN()) {
   // -- Create pair out of 2 tracks
   //     prefixes code:
   //      p1 means particle 1
@@ -40,13 +40,14 @@ StMixerPair::StMixerPair(StMixerTrack const * const particle1, StMixerTrack cons
   
   mParticle1Mom = particle1->gMom();
   mParticle2Mom = particle2->gMom();
-
+  StThreeVectorF dVtx = vtx1 - vtx2;
+  //Move origin of second by difference between 2 event vertices
   StPhysicalHelixD p1Helix(particle1->gMom(), particle1->origin(), particle1->charge(), bField); 
-  StPhysicalHelixD p2Helix(particle2->gMom(), particle2->origin(), particle2->charge(), bField); 
+  StPhysicalHelixD p2Helix(particle2->gMom(), particle2->origin() - dVtx, particle2->charge(), bField); 
 
   // -- move origins of helices to the primary vertex origin
-  p1Helix.moveOrigin(p1Helix.pathLength(vtx));
-  p2Helix.moveOrigin(p2Helix.pathLength(vtx));
+  p1Helix.moveOrigin(p1Helix.pathLength(vtx1));
+  p2Helix.moveOrigin(p2Helix.pathLength(vtx1));
 
   // -- use straight lines approximation to get point of DCA of particle1-particle2 pair
   StThreeVectorF const p1Mom = p1Helix.momentum(bField * kilogauss);
@@ -81,15 +82,15 @@ StMixerPair::StMixerPair(StMixerTrack const * const particle1, StMixerTrack cons
   // -- calculate pointing angle and decay length with respect to primary vertex 
   //    if decay vertex is a tertiary vertex
   //    -> only rough estimate -> needs to be updated after secondary vertex is found
-  StThreeVectorF const vtxToV0 = mDecayVertex - vtx;
+  StThreeVectorF const vtxToV0 = mDecayVertex - vtx1;
   mPointingAngle = vtxToV0.angle(mLorentzVector.vect());
   mDecayLength = vtxToV0.mag();
 
   // -- calculate DCA of tracks to primary vertex
   //    if decay vertex is a tertiary vertex
   //    -> only rough estimate -> needs to be updated after secondary vertex is found
-  mParticle1Dca = (p1Helix.origin() - vtx).mag();
-  mParticle2Dca = (p2Helix.origin() - vtx).mag();
+  mParticle1Dca = (p1Helix.origin() - vtx1).mag();
+  mParticle2Dca = (p2Helix.origin() - vtx1).mag();
 }
 
 

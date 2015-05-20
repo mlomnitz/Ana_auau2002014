@@ -22,12 +22,16 @@
 #include <limits>
 #include <iostream>
 #include "StMixerEvent.h"
+#include "StMixerPair.h" 
+#include "TH1.h"
 
 class StPicoEvent;
 class StPicoTrack;
 class StPicoDst;
 class StMixerTrack;
 class StMixerEvent;
+class StMixerPair;
+
 class StHFCuts;
 
 class StPicoEventMixer {
@@ -41,13 +45,15 @@ class StPicoEventMixer {
  private:
   void InitMixedEvent();
   void FinishMixedEvent();
+  void fill(StMixerPair const * const);
   bool isPion(StMixerTrack);
   bool isKaon(StMixerTrack);
-  
+  TH1 * mBackground;
   std::vector < StMixerEvent > mEvents; //Needs to be generalized to more categories Using TCLones array
 
   unsigned short int mEventsBuffer; 
   unsigned short int filledBuffer;
+  
 
 };
 

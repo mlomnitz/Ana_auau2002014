@@ -43,7 +43,9 @@ class StPicoMixedEventMaker : public StMaker
     virtual Int_t Finish();
     virtual void  Clear(Option_t *opt="");
     Int_t SetCategories();
+
  private:
+    int categorize(StPicoDst const *);
     StPicoDst      *mPicoDst;
     StPicoDstMaker* mPicoDstMaker;      
     StPicoEvent*    mPicoEvent;         
