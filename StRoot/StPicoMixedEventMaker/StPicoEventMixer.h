@@ -22,6 +22,7 @@
 #include <limits>
 #include <iostream>
 #include "StMixerEvent.h"
+#include "StMixerTrack.h"
 #include "StMixerPair.h" 
 #include "TH1.h"
 
@@ -39,7 +40,7 @@ class StPicoEventMixer {
   StPicoEventMixer();
   ~StPicoEventMixer(){;};
   bool addPicoEvent(const StPicoDst *picoDst);
-  void addPicoTrack(StMixerEvent ,StPicoTrack const * );
+  StMixerTrack * makeMixerTrack(StPicoTrack const * );
   void setEventBuffer(int buffer);
   void mixEvents();
  private:

@@ -1,5 +1,4 @@
 #include "StMixerEvent.h"
-#include "StMixerTrack.h"
 
 #include <limits>
 StMixerEvent::StMixerEvent() :  mVtx(StThreeVectorF()), mEventTracks(0),
@@ -13,5 +12,6 @@ StMixerEvent::StMixerEvent(StMixerEvent *t) : mVtx(t->mVtx), mEventTracks(t->mEv
 void StMixerEvent::addTrack(StMixerTrack *t)
 {
   mEventTracks.push_back(t);
+  mNoTracks++;
   return;
 }

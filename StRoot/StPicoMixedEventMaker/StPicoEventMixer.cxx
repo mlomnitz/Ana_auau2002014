@@ -6,13 +6,12 @@
 #include "StPicoHFMaker/StHFCuts.h"
 #include "StPicoMixedEventMaker.h"
 
-#include "StMixerTrack.h"
 #include "StMixerEvent.h"
 #include "StMixerPair.h"
 #include "StMixerTriplet.h"
 #include <vector>
 
-StPicoEventMixer::StPicoEventMixer(): mEvents(0), mEventsBuffer(std::numeric_limits<int>::min()), filledBuffer(0)
+StPicoEventMixer::StPicoEventMixer(): mEvents(), mEventsBuffer(std::numeric_limits<int>::min()), filledBuffer(0)
 {
   InitMixedEvent();
   return;
@@ -28,17 +27,18 @@ bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst)
 {
   StMixerEvent Event;
   StPicoEvent * picoEvent = picoDst->event();
-  int nTracks = picoEvent->numberOfGlobalTracks();
+  int nTracks = picoDst->numberOfTracks();
   StThreeVectorF pVertex = picoEvent->primaryVertex();
   
   Event.setPos( pVertex.x(), pVertex.y(), pVertex.z() );
   Event.setField( picoEvent->bField() );
-  Event.setNoTracks( nTracks );
+  //Event.setNoTracks( nTracks );
   for( int iTrk = 0; iTrk < nTracks; iTrk++ ){
     StPicoTrack * trk = picoDst->track(iTrk);
-    addPicoTrack(Event,trk);
+    Event.addTrack( makeMixerTrack(trk) );
   } 
   if ( nTracks > 0 ){
+    cout<<Event.getNoTracks()<<endl;
     mEvents.push_back(Event);
     filledBuffer+=1;
   }
@@ -47,15 +47,14 @@ bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst)
     return true;
   return false;
 }  
-void StPicoEventMixer::addPicoTrack(StMixerEvent a, StPicoTrack const * picoTrack)
+StMixerTrack * StPicoEventMixer::makeMixerTrack(StPicoTrack const * picoTrack)
 {
   bool isTpcPi = false;
   bool isTofPi = false;
   bool isTpcK = false;
   bool isTofK = false;
   StMixerTrack *metrk = new StMixerTrack(picoTrack, isTpcPi, isTofPi, isTpcK, isTofK);
-  a.addTrack(metrk);
-  return;
+  return metrk;
 }
 void StPicoEventMixer::mixEvents(){
   short int const nEvent = mEvents.size();
@@ -66,13 +65,13 @@ void StPicoEventMixer::mixEvents(){
 
     for( int iTrk1 = 0; iTrk1 < nTracksEvt1; iTrk1++){
       for( int iTrk2 = 0; iTrk2 < nTracksEvt2; iTrk2++){
-	StMixerTrack *pion = mEvents.at(0).trackAt(iTrk1);
+	StMixerTrack pion = mEvents.at(0).trackAt(iTrk1);
 	if( !isPion(mEvents.at(0).trackAt(iTrk1)) ) continue;
 
 
-	StMixerTrack *kaon = mEvents.at(iEvt2).trackAt(iTrk2);
+	StMixerTrack kaon = mEvents.at(iEvt2).trackAt(iTrk2);
 	if ( !isKaon(mEvents.at(iEvt2).trackAt(iTrk2)) ) continue;
-	if( kaon->charge() == pion->charge() ) continue;
+	if( kaon.charge() == pion.charge() ) continue;
 
 	StMixerPair *pair = new StMixerPair(mEvents.at(0).trackAt(iTrk1), mEvents.at(iEvt2).trackAt(iTrk2),
 					    StHFCuts::kPion, StHFCuts::kPion,

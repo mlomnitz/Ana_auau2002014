@@ -3,6 +3,7 @@
 #include <math.h>
 #include <vector>
 #include "StThreeVectorF.hh"
+#include "StMixerTrack.h"
 /* **************************************************
  *
  * Event class used for mixed event buffer, stripped down 
