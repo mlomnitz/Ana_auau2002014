@@ -31,6 +31,7 @@
 #include "StPicoHFMaker/StPicoHFEvent.h"
 
 #include "StPicoMixedEventMaker/StPicoMixedEventMaker.h"
+#include "StPicoHFMaker/StHFCuts.h"
 
 #else
 class StChain;
@@ -54,7 +55,7 @@ void runPicoMixedEvent(const Char_t *inputFile="test.list", const Char_t *output
   // ========================================================================================
   //   Testing 
   // ========================================================================================
-  Int_t nEvents = 1;
+  Int_t nEvents = 15;
 	
   gROOT->LoadMacro("$STAR/StRoot/StMuDSTMaker/COMMON/macros/loadSharedLibraries.C");
   loadSharedLibraries();
@@ -62,8 +63,9 @@ void runPicoMixedEvent(const Char_t *inputFile="test.list", const Char_t *output
   gSystem->Load("StBTofUtil");
   gSystem->Load("StPicoDstMaker");
   gSystem->Load("StPicoPrescales");
+  gSystem->Load("StPicoHFMaker");
   gSystem->Load("StPicoMixedEventMaker");
-
+  
   chain = new StChain();
 
   // ========================================================================================
@@ -77,6 +79,40 @@ void runPicoMixedEvent(const Char_t *inputFile="test.list", const Char_t *output
   // ========================================================================================
   StPicoDstMaker* picoDstMaker = new StPicoDstMaker(0, sInputFile, "picoDstMaker");
   StPicoMixedEventMaker* picoMixedEventMaker = new StPicoMixedEventMaker("picoMixedEventMaker", picoDstMaker, outputFile, sInputListHF);
+
+  StHFCuts* hfCuts = new StHFCuts("hfBaseCuts");
+  picoMixedEventMaker -> setHFBaseCuts(hfCuts);
+
+  // ---------------------------------------------------
+  // -- Set Base cuts for HF analysis
+
+  // -- File name of bad run list
+  //hfCuts->setBadRunListFileName(badRunListFileName);
+
+  // -- Event and track cuts  ----------------------------
+  hfCuts->setCutVzMax(6.);
+  hfCuts->setCutVzVpdVzMax(3.);
+  //hfCuts->setCutTriggerWord(0x1F);
+
+  hfCuts->setCutNHitsFitMax(15); 
+  hfCuts->setCutRequireHFT(false);
+  // hfCuts->setCutNHitsFitnHitsMax(0.52);
+
+  // -- Topological and PID cuts ------------------------
+  hfCuts->setCutSecondaryPair(0.75, 1.0, 7.0, 
+			      0.9, 0,2.0 );
+  //Single track pt
+  hfCuts->setCutPtRange(0.6,2.0,StHFCuts::kPion);
+  hfCuts->setCutPtRange(0.6,2.0,StHFCuts::kKaon);
+  //TPC setters
+  hfCuts->setCutTPCNSigmaPion(3.0);
+  hfCuts->setCutTPCNSigmaKaon(3.0);
+  //TOF setters, need to set pt range as well
+  hfCuts->setCutTOFDeltaOneOverBeta(0.05, StHFCuts::kKaon);
+  hfCuts->setCutPtotRangeHybridTOF(0.6,2.0,StHFCuts::kKaon);
+  hfCuts->setCutTOFDeltaOneOverBeta(0.05, StHFCuts::kPion);
+  hfCuts->setCutPtotRangeHybridTOF(0.6,2.0,StHFCuts::kPion);
+  // ---------------------------------------------------
 
   chain->Init();
   cout << "chain->Init();" << endl;

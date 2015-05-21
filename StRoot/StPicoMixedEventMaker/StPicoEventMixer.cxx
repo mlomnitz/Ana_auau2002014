@@ -25,7 +25,7 @@ void StPicoEventMixer::FinishMixedEvent(){
   mBackground -> Write();
   return;
 }
-bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst)
+bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst, StHFCuts *mHFCuts)
 {
   StMixerEvent Event;
   StPicoEvent * picoEvent = picoDst->event();
@@ -34,10 +34,22 @@ bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst)
   
   Event.setPos( pVertex.x(), pVertex.y(), pVertex.z() );
   Event.setField( picoEvent->bField() );
+  bool isTpcPi = false;
+  bool isTofPi = false;
+  bool isTpcK = false;
+  bool isTofK = false;
   //Event.setNoTracks( nTracks );
   for( int iTrk = 0; iTrk < nTracks; iTrk++ ){
     StPicoTrack * trk = picoDst->track(iTrk);
-    Event.addTrack( makeMixerTrack(trk) );
+    if( mHFCuts->isTPCPion(trk) && mHFCuts->isGoodTrack(trk)){
+      isTpcPi = true;
+      isTofPi = true;
+    }
+    if( mHFCuts->isTPCKaon(trk) && mHFCuts->isGoodTrack(trk)){
+      isTpcK = true;
+      isTofK = true;
+    }
+    Event.addTrack( makeMixerTrack(trk, isTpcPi, isTofPi, isTpcK, isTofK) );
   } 
   if ( nTracks > 0 ){
     mEvents.push_back(Event);
@@ -48,16 +60,12 @@ bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst)
     return true;
   return false;
 }  
-StMixerTrack * StPicoEventMixer::makeMixerTrack(StPicoTrack const * picoTrack)
+StMixerTrack * StPicoEventMixer::makeMixerTrack(StPicoTrack const * picoTrack, bool isTpcPi, bool isTofPi, bool isTpcK, bool isTofK)
 {
-  bool isTpcPi = false;
-  bool isTofPi = false;
-  bool isTpcK = false;
-  bool isTofK = false;
   StMixerTrack *metrk = new StMixerTrack(picoTrack, isTpcPi, isTofPi, isTpcK, isTofK);
   return metrk;
 }
-void StPicoEventMixer::mixEvents(){
+void StPicoEventMixer::mixEvents(StHFCuts *mHFCuts){
   short int const nEvent = mEvents.size();
   int const nTracksEvt1 = mEvents.at(0).getNoTracks();
 
@@ -67,18 +75,19 @@ void StPicoEventMixer::mixEvents(){
     for( int iTrk1 = 0; iTrk1 < nTracksEvt1; iTrk1++){
       for( int iTrk2 = 0; iTrk2 < nTracksEvt2; iTrk2++){
 	StMixerTrack pion = mEvents.at(0).trackAt(iTrk1);
-	//	if( !isPion(mEvents.at(0).trackAt(iTrk1)) ) continue;
+	if( !isMixerPion(mEvents.at(0).trackAt(iTrk1)) ) continue;
 
 
-	StMixerTrack kaon = mEvents.at(iEvt2).trackAt(iTrk2);
-	//	if ( !isKaon(mEvents.at(iEvt2).trackAt(iTrk2)) ) continue;
-	if( kaon.charge() == pion.charge() ) continue;
+	StMixerTrack pion2 = mEvents.at(iEvt2).trackAt(iTrk2);
+	if ( !isMixerPion(mEvents.at(iEvt2).trackAt(iTrk2)) ) continue;
+	if( pion2.charge() == pion.charge() ) continue;
+
 	StMixerPair *pair = new StMixerPair(mEvents.at(0).trackAt(iTrk1), mEvents.at(iEvt2).trackAt(iTrk2),
 					    StHFCuts::kPion, StHFCuts::kPion,
 					    mEvents.at(0).vertex(), mEvents.at(iEvt2).vertex(),
 					    mEvents.at(0).field() );
 	fill(pair);
-	//if( !mHFCuts->isGoodMixerPair(pair) ) continue;
+	if( !mHFCuts->isGoodMixerPair(pair) ) continue;
 	
 	//And now? Need to determine what and how it is going to be saved
       } //second event track loop
@@ -88,8 +97,9 @@ void StPicoEventMixer::mixEvents(){
   mEvents.erase(mEvents.begin());
   //mEvents.erase(mEvents.begin());
   return;
-}
-bool StPicoEventMixer::isPion(StMixerTrack track){
+} 
+// _________________________________________________________
+bool StPicoEventMixer::isMixerPion(StMixerTrack track){
   short info = track.getTrackInfo();
   //TPC pion
   if( (info & 2) >> 1 != 1) return false;
@@ -97,8 +107,8 @@ bool StPicoEventMixer::isPion(StMixerTrack track){
   if( (info & 4) >> 2 != 1) return false;
   return true;
 }
-
-bool StPicoEventMixer::isKaon(StMixerTrack track){
+// _________________________________________________________
+bool StPicoEventMixer::isMixerKaon(StMixerTrack track){
   short info = track.getTrackInfo();
   //TPC Kaon
   if( (info & 8) >> 3 != 1) return false;
@@ -106,8 +116,8 @@ bool StPicoEventMixer::isKaon(StMixerTrack track){
   if( (info & 16) >> 4 != 1) return false;
   return true;
 }
+// _________________________________________________________
 void StPicoEventMixer::fill(StMixerPair const * const pair){
-  cout<<"Pair mass"<<pair->m()<<endl;;
   mBackground -> Fill(pair->m());
   return;
 }

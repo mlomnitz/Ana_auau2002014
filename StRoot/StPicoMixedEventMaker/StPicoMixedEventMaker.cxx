@@ -9,7 +9,7 @@
 #include "StPicoDstMaker/StPicoTrack.h"
 #include "StPicoDstMaker/StPicoBTofPidTraits.h"
 #include "StPicoPrescales/StPicoPrescales.h"
-
+#include "StPicoHFMaker/StHFCuts.h"
 #include "StPicoMixedEventMaker.h"
 #include "StPicoEventMixer.h"
 
@@ -98,8 +98,8 @@ Int_t StPicoMixedEventMaker::Make(){
     return kStWarn;
   }
   
-  if( mPicoEventMixer -> addPicoEvent(picoDst) ==  true )
-    mPicoEventMixer->mixEvents();
+  if( mPicoEventMixer -> addPicoEvent(picoDst,mHFCuts) ==  true )
+    mPicoEventMixer->mixEvents(mHFCuts);
   //mTree->Fill();
 
   return kStOk;

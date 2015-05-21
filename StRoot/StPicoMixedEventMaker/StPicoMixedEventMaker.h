@@ -31,6 +31,7 @@ class StPicoDstMaker;
 class StPicoEvent;
 class StPicoTrack;
 class StPicoEventMixer;
+class StHFCuts;
 
 class StPicoMixedEventMaker : public StMaker 
 {
@@ -42,8 +43,9 @@ class StPicoMixedEventMaker : public StMaker
     virtual Int_t Make();
     virtual Int_t Finish();
     virtual void  Clear(Option_t *opt="");
+    void setHFBaseCuts(StHFCuts *cuts);
     Int_t SetCategories();
-
+    StHFCuts *mHFCuts;
  private:
     int categorize(StPicoDst const *);
     StPicoDst      *mPicoDst;
@@ -65,4 +67,5 @@ class StPicoMixedEventMaker : public StMaker
 
     ClassDef(StPicoMixedEventMaker, 1)
 };
+inline void StPicoMixedEventMaker::setHFBaseCuts(StHFCuts *cuts)  {mHFCuts = cuts; }
 #endif

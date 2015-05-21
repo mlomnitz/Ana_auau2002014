@@ -39,16 +39,16 @@ class StPicoEventMixer {
  public: 
   StPicoEventMixer();
   ~StPicoEventMixer(){;};
-  bool addPicoEvent(const StPicoDst *picoDst);
-  StMixerTrack * makeMixerTrack(StPicoTrack const * );
+  bool addPicoEvent(const StPicoDst *picoDst, StHFCuts *mHFCuts);
+  StMixerTrack * makeMixerTrack(StPicoTrack const * , bool, bool, bool, bool);
   void setEventBuffer(int buffer);
-  void mixEvents();
+  void mixEvents(StHFCuts *mHFCuts);
   void InitMixedEvent();
   void FinishMixedEvent();
  private:
   void fill(StMixerPair const * const);
-  bool isPion(StMixerTrack);
-  bool isKaon(StMixerTrack);
+  bool isMixerPion(StMixerTrack);
+  bool isMixerKaon(StMixerTrack);
   TH1F * mBackground;
   std::vector < StMixerEvent > mEvents; //Needs to be generalized to more categories Using TCLones array
 
