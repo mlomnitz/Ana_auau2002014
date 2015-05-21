@@ -12,13 +12,13 @@ StMixerTrack::StMixerTrack(StPicoTrack const *picoTrack, bool isTpcPi, bool isTo
   mOrigin = picoTrack->helix().origin();
   mMom = picoTrack->gMom();
   
-  if( picoTrack->charge() > 0 ) mTrackInfo = mTrackInfo | (1 << 1);
+  if( picoTrack->charge() > 0 ) mTrackInfo = mTrackInfo | 1;
   //Pi
-  if( isTpcPi == true ) mTrackInfo = mTrackInfo | (1 << 2);
-  if( isTofPi == true ) mTrackInfo = mTrackInfo | (1 << 3);
+  if( isTpcPi == true ) mTrackInfo = mTrackInfo | (1 << 1);
+  if( isTofPi == true ) mTrackInfo = mTrackInfo | (1 << 2);
   //K
-  if( isTpcK == true ) mTrackInfo = mTrackInfo | (1 << 4);
-  if( isTofK == true ) mTrackInfo = mTrackInfo | (1 << 5);
+  if( isTpcK == true ) mTrackInfo = mTrackInfo | (1 << 3);
+  if( isTofK == true ) mTrackInfo = mTrackInfo | (1 << 4);
 
 }
 StMixerTrack::StMixerTrack(StMixerTrack const * t) : mOrigin(t->mOrigin), mMom(t->mMom), mTrackInfo(t->mTrackInfo)
