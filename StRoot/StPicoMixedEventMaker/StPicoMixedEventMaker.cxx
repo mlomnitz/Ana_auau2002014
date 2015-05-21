@@ -71,6 +71,7 @@ Int_t StPicoMixedEventMaker::Finish() {
   //    daughter class should implement FinishHF()
   mOutputFileTree->cd();
   mOutputFileTree->Write();
+  mPicoEventMixer->FinishMixedEvent();
   mOutputFileTree->Close();
 
   //mOutputFileList->cd();
@@ -97,8 +98,8 @@ Int_t StPicoMixedEventMaker::Make(){
     return kStWarn;
   }
   
-  mPicoEventMixer -> addPicoEvent(picoDst);
-  
+  if( mPicoEventMixer -> addPicoEvent(picoDst) ==  true )
+    mPicoEventMixer->mixEvents();
   //mTree->Fill();
 
   return kStOk;

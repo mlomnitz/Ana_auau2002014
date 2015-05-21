@@ -18,9 +18,11 @@ StPicoEventMixer::StPicoEventMixer(): mEvents(), mEventsBuffer(std::numeric_limi
 }
 void StPicoEventMixer::InitMixedEvent(){
   setEventBuffer(11);
+  mBackground = new TH1F("bgMass","Mixed Event Invariant mass",100,0,5);
   return;
 }
 void StPicoEventMixer::FinishMixedEvent(){
+  mBackground -> Write();
   return;
 }
 bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst)
@@ -38,12 +40,11 @@ bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst)
     Event.addTrack( makeMixerTrack(trk) );
   } 
   if ( nTracks > 0 ){
-    cout<<Event.getNoTracks()<<endl;
     mEvents.push_back(Event);
     filledBuffer+=1;
   }
   //Returns true if need to do mixing, false if buffer has space still
-  if ( filledBuffer == mEventsBuffer )
+  if ( filledBuffer == mEventsBuffer - 1 )
     return true;
   return false;
 }  
@@ -66,13 +67,12 @@ void StPicoEventMixer::mixEvents(){
     for( int iTrk1 = 0; iTrk1 < nTracksEvt1; iTrk1++){
       for( int iTrk2 = 0; iTrk2 < nTracksEvt2; iTrk2++){
 	StMixerTrack pion = mEvents.at(0).trackAt(iTrk1);
-	if( !isPion(mEvents.at(0).trackAt(iTrk1)) ) continue;
+	//	if( !isPion(mEvents.at(0).trackAt(iTrk1)) ) continue;
 
 
 	StMixerTrack kaon = mEvents.at(iEvt2).trackAt(iTrk2);
-	if ( !isKaon(mEvents.at(iEvt2).trackAt(iTrk2)) ) continue;
+	//	if ( !isKaon(mEvents.at(iEvt2).trackAt(iTrk2)) ) continue;
 	if( kaon.charge() == pion.charge() ) continue;
-
 	StMixerPair *pair = new StMixerPair(mEvents.at(0).trackAt(iTrk1), mEvents.at(iEvt2).trackAt(iTrk2),
 					    StHFCuts::kPion, StHFCuts::kPion,
 					    mEvents.at(0).vertex(), mEvents.at(iEvt2).vertex(),
@@ -84,6 +84,7 @@ void StPicoEventMixer::mixEvents(){
       } //second event track loop
     } //first event track loop 
   } //loop over second events
+  filledBuffer--;
   mEvents.erase(mEvents.begin());
   //mEvents.erase(mEvents.begin());
   return;
@@ -106,6 +107,7 @@ bool StPicoEventMixer::isKaon(StMixerTrack track){
   return true;
 }
 void StPicoEventMixer::fill(StMixerPair const * const pair){
+  cout<<"Pair mass"<<pair->m()<<endl;;
   mBackground -> Fill(pair->m());
   return;
 }
