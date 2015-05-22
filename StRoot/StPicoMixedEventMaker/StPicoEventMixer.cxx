@@ -13,6 +13,7 @@
 
 StPicoEventMixer::StPicoEventMixer(): mEvents(), mEventsBuffer(std::numeric_limits<int>::min()), filledBuffer(0)
 {
+  StMemStat mem;
   InitMixedEvent();
   return;
 }
@@ -27,13 +28,10 @@ void StPicoEventMixer::FinishMixedEvent(){
 }
 bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst, StHFCuts *mHFCuts)
 {
-  StMixerEvent Event;
-  StPicoEvent * picoEvent = picoDst->event();
   int nTracks = picoDst->numberOfTracks();
-  StThreeVectorF pVertex = picoEvent->primaryVertex();
-  
-  Event.setPos( pVertex.x(), pVertex.y(), pVertex.z() );
-  Event.setField( picoEvent->bField() );
+  StThreeVectorF pVertex = picoDst->event()->primaryVertex();
+  StMixerEvent *Event = new StMixerEvent(pVertex, picoDst->event()->bField());
+
   bool isTpcPi = false;
   bool isTofPi = false;
   bool isTpcK = false;
@@ -49,53 +47,62 @@ bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst, StHFCuts *mHFCuts
       isTpcK = true;
       isTofK = true;
     }
-    Event.addTrack( makeMixerTrack(trk, isTpcPi, isTofPi, isTpcK, isTofK) );
+    StMixerTrack *mTrack = new StMixerTrack(trk, isTpcPi, isTofPi, isTpcK, isTofK);
+    Event->addTrack(mTrack);
+    delete mTrack;
   } 
   if ( nTracks > 0 ){
     mEvents.push_back(Event);
     filledBuffer+=1;
+  }
+  else {
+    delete Event;
+    return false;
   }
   //Returns true if need to do mixing, false if buffer has space still
   if ( filledBuffer == mEventsBuffer - 1 )
     return true;
   return false;
 }  
-StMixerTrack * StPicoEventMixer::makeMixerTrack(StPicoTrack const * picoTrack, bool isTpcPi, bool isTofPi, bool isTpcK, bool isTofK)
-{
-  StMixerTrack *metrk = new StMixerTrack(picoTrack, isTpcPi, isTofPi, isTpcK, isTofK);
-  return metrk;
-}
 void StPicoEventMixer::mixEvents(StHFCuts *mHFCuts){
   short int const nEvent = mEvents.size();
-  int const nTracksEvt1 = mEvents.at(0).getNoTracks();
-
+  int const nTracksEvt1 = mEvents.at(0)->getNoTracks();
   for( int iEvt2 = 1; iEvt2 < nEvent; iEvt2++){
-    int const nTracksEvt2 = mEvents.at(iEvt2).getNoTracks();
-
+    int const nTracksEvt2 = mEvents.at(iEvt2)->getNoTracks();
     for( int iTrk1 = 0; iTrk1 < nTracksEvt1; iTrk1++){
+      StMixerTrack *pion = new StMixerTrack(mEvents.at(0)->trackAt(iTrk1));
+
+      if( !isMixerPion(pion) ) {
+	delete pion;
+	continue;
+      }
       for( int iTrk2 = 0; iTrk2 < nTracksEvt2; iTrk2++){
-	StMixerTrack pion = mEvents.at(0).trackAt(iTrk1);
-	if( !isMixerPion(mEvents.at(0).trackAt(iTrk1)) ) continue;
+	StMixerTrack *pion2 = new StMixerTrack(mEvents.at(iEvt2)->trackAt(iTrk2));
+	if ( !isMixerPion(pion2) ) {
+	  delete pion2;
+	  continue;
+	}
+	if( pion2->charge() == pion->charge() ) {
+	  delete pion2;
+	  continue;
+	}
 
-
-	StMixerTrack pion2 = mEvents.at(iEvt2).trackAt(iTrk2);
-	if ( !isMixerPion(mEvents.at(iEvt2).trackAt(iTrk2)) ) continue;
-	if( pion2.charge() == pion.charge() ) continue;
-
-	StMixerPair *pair = new StMixerPair(mEvents.at(0).trackAt(iTrk1), mEvents.at(iEvt2).trackAt(iTrk2),
+	StMixerPair *pair = new StMixerPair(pion, pion2,
 					    StHFCuts::kPion, StHFCuts::kPion,
-					    mEvents.at(0).vertex(), mEvents.at(iEvt2).vertex(),
-					    mEvents.at(0).field() );
-	fill(pair);
-	if( !mHFCuts->isGoodMixerPair(pair) ) continue;
-	
-	//And now? Need to determine what and how it is going to be saved
+					    mEvents.at(0)->vertex(), mEvents.at(iEvt2)->vertex(),
+					    mEvents.at(0)->field() );
+	if( !mHFCuts->isGoodMixerPair(pair) )
+	  fill(pair);
+	delete pair;
+	delete pion2;
+
       } //second event track loop
+      delete pion;
     } //first event track loop 
   } //loop over second events
   filledBuffer--;
+  delete mEvents.at(0)	;
   mEvents.erase(mEvents.begin());
-  //mEvents.erase(mEvents.begin());
   return;
 } 
 // _________________________________________________________

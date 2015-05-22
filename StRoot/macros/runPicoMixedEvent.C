@@ -32,6 +32,7 @@
 
 #include "StPicoMixedEventMaker/StPicoMixedEventMaker.h"
 #include "StPicoHFMaker/StHFCuts.h"
+#include "StMemStat.h"
 
 #else
 class StChain;
@@ -46,6 +47,7 @@ void runPicoMixedEvent(const Char_t *inputFile="test.list", const Char_t *output
 			 const Char_t *badRunListFileName = "picoList_bad_MB.list") { 
   // -- Check STAR Library. Please set SL_version to the original star library used in the production 
   //    from http://www.star.bnl.gov/devcgi/dbProdOptionRetrv.pl
+  StMemStat mem;
   string SL_version = "SL15c";
   string env_SL = getenv ("STAR");
   if (env_SL.find(SL_version)==string::npos) {
@@ -55,7 +57,7 @@ void runPicoMixedEvent(const Char_t *inputFile="test.list", const Char_t *output
   // ========================================================================================
   //   Testing 
   // ========================================================================================
-  Int_t nEvents = 15;
+  Int_t nEvents = 10000000;
 	
   gROOT->LoadMacro("$STAR/StRoot/StMuDSTMaker/COMMON/macros/loadSharedLibraries.C");
   loadSharedLibraries();
@@ -120,12 +122,13 @@ void runPicoMixedEvent(const Char_t *inputFile="test.list", const Char_t *output
   cout << " Total entries = " << total << endl;
   if(nEvents>total) nEvents = total;
   for (Int_t i=0; i<nEvents; i++) {
-    if(i%10000==0)
+    if(i%10==0)
       cout << "Working on eventNumber " << i << endl;
     
     chain->Clear();
+
     int iret = chain->Make(i);
-    
+
     if (iret) { cout << "Bad return code!" << iret << endl; break;}
     
     total++;
