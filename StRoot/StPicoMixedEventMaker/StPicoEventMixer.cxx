@@ -19,10 +19,14 @@ StPicoEventMixer::StPicoEventMixer(): mEvents(), mEventsBuffer(std::numeric_limi
 void StPicoEventMixer::InitMixedEvent(){
   setEventBuffer(11);
   mBackground = new TH1F("bgMass","Mixed Event Invariant mass",100,0,5);
+  mNtuple = new TNtuple("bgNtp","Mixed event background","dca1:dca2:dcaDaughters:"
+			"theta_hs:decayL_hs:"
+			"pt_hs:mass_hs:eta_hs:phi_hs");
   return;
 }
 void StPicoEventMixer::FinishMixedEvent(){
   mBackground -> Write();
+  mNtuple ->Write();
   return;
 }
 bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst, StHFCuts *mHFCuts)
@@ -119,5 +123,17 @@ bool StPicoEventMixer::isMixerKaon(StMixerTrack track){
 // _________________________________________________________
 void StPicoEventMixer::fill(StMixerPair const * const pair){
   mBackground -> Fill(pair->m());
+  float ntVar[30];
+  int ii = 0;
+  ntVar[ii++] = pair->particle1Dca(); 
+  ntVar[ii++] = pair->particle2Dca();
+  ntVar[ii++] = pair->dcaDaughters();
+  ntVar[ii++] = pair->pointingAngle(); 
+  ntVar[ii++] = pair->decayLength();
+  ntVar[ii++] = pair->pt();
+  ntVar[ii++] = pair->m();
+  ntVar[ii++] = pair->eta();
+  ntVar[ii++] = pair->phi();
+  mNtuple->Fill(ntVar);
   return;
 }

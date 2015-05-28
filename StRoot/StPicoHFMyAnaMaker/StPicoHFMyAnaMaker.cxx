@@ -40,7 +40,9 @@ int StPicoHFMyAnaMaker::InitHF() {
 
   // EXAMPLE //  mOutList->Add(new TH1F(...));
   // EXAMPLE //  TH1F* hist = static_cast<TH1F*>(mOutList->Last());
-  
+  ntp_DMeson = new TNtuple("ntp","DMeson Tree", "dca1:dca2:dcaDaughters:"
+			   "pt1:pt2:theta_hs:decayL_hs:"
+			   "pt_hs:mass_hs:eta_hs:phi_hs");
   return kStOK;
 }
 
@@ -51,6 +53,7 @@ void StPicoHFMyAnaMaker::ClearHF(Option_t *opt="") {
 
 // _________________________________________________________
 int StPicoHFMyAnaMaker::FinishHF() {
+  ntp_DMeson->Write();
   return kStOK;
 }
 
@@ -88,18 +91,17 @@ int StPicoHFMyAnaMaker::createCandidates() {
   // -- Decay channel1 --- EXAMPLE
   if (mDecayChannel == StPicoHFMyAnaMaker::kChannel1) {
 
-    for (unsigned short idxKaon = 0; idxKaon < mIdxPicoKaons.size(); ++idxKaon) {
-      StPicoTrack const *kaon = mPicoDst->track(mIdxPicoKaons[idxKaon]);
-      
-      for (unsigned short idxPion = 0; idxPion < mIdxPicoPions.size(); ++idxPion) {
-	StPicoTrack const *pion = mPicoDst->track(mIdxPicoPions[idxPion]);
-	
-	if (mIdxPicoKaons[idxKaon] == mIdxPicoPions[idxPion]) 
+    for (unsigned short idxPion1 = 0; idxPion1 < mIdxPicoPions.size(); ++idxPion1) {
+      StPicoTrack const *pion1 = mPicoDst->track(mIdxPicoPions[idxPion1]);
+      if( !mHFCuts->isTPCPion(pion1) || !mHFCuts->isGoodTrack(pion1)) continue;
+      for (unsigned short idxPion2 = idxPion1+1; idxPion2 < mIdxPicoPions.size(); ++idxPion2) {
+	StPicoTrack const *pion2 = mPicoDst->track(mIdxPicoPions[idxPion2]);
+	if( !mHFCuts->isTPCPion(pion2) || !mHFCuts->isGoodTrack(pion2)) continue;
+	if (mIdxPicoPions[idxPion1] == mIdxPicoPions[idxPion2]) 
 	  continue;
-      
-	StHFPair pair(kaon, pion,
-		      mHFCuts->getHypotheticalMass(StHFCuts::kKaon), mHFCuts->getHypotheticalMass(StHFCuts::kPion),
-		      mIdxPicoKaons[idxKaon], mIdxPicoPions[idxPion], mPrimVtx, mBField);
+	StHFPair pair(pion1, pion2,
+		      mHFCuts->getHypotheticalMass(StHFCuts::kPion), mHFCuts->getHypotheticalMass(StHFCuts::kPion),
+		      mIdxPicoPions[idxPion1], mIdxPicoPions[idxPion2], mPrimVtx, mBField);
 	if (!mHFCuts->isGoodSecondaryVertexPair(pair)) 
 	  continue;
 	mPicoHFEvent->addHFSecondaryVertexPair(&pair);
@@ -130,8 +132,25 @@ int StPicoHFMyAnaMaker::analyzeCandidates() {
     for (unsigned int idx = 0; idx <  mPicoHFEvent->nHFSecondaryVertices(); ++idx) {
       StHFPair const* pair = static_cast<StHFPair*>(aCandidates->At(idx));
 
-      StPicoTrack const* kaon = mPicoDst->track(pair->particle1Idx());
-      StPicoTrack const* pion = mPicoDst->track(pair->particle2Idx());
+      StPicoTrack const* pion1 = mPicoDst->track(pair->particle1Idx());
+      StPicoTrack const* pion2 = mPicoDst->track(pair->particle2Idx());
+      float ntVar[30];
+      int ii = 0;
+      float const pt1=sqrt(pow(pion1->gMom().x(),2.0)+pow(pion1->gMom().y(),2.0));
+      float const pt2=sqrt(pow(pion2->gMom().x(),2.0)+pow(pion2->gMom().y(),2.0));
+      float const pt=sqrt(pow(pair->px(),2.0)+pow(pair->py(),2.0));
+      ntVar[ii++] = pair->particle1Dca();
+      ntVar[ii++] = pair->particle2Dca();
+      ntVar[ii++] = pair->dcaDaughters();
+      ntVar[ii++] = pt1;
+      ntVar[ii++] = pt2;
+      ntVar[ii++] = pair->pointingAngle();
+      ntVar[ii++] = pair->decayLength();
+      ntVar[ii++] = pt;
+      ntVar[ii++] = pair->m();
+      ntVar[ii++] = pair->eta();
+      ntVar[ii++] = pair->phi();
+      ntp_DMeson->Fill(ntVar);
 
     } // for (unsigned int idx = 0; idx <  mPicoHFEvent->nHFSecondaryVertices(); ++idx) {
   } // else  if (mDecayChannel == StPicoHFMyAnaMaker::kChannel1) {

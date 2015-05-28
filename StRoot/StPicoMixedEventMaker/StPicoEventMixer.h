@@ -25,7 +25,7 @@
 #include "StMixerTrack.h"
 #include "StMixerPair.h" 
 #include "TH1.h"
-
+#include "TNtuple.h"
 class StPicoEvent;
 class StPicoTrack;
 class StPicoDst;
@@ -50,6 +50,7 @@ class StPicoEventMixer {
   bool isMixerPion(StMixerTrack);
   bool isMixerKaon(StMixerTrack);
   TH1F * mBackground;
+  TNtuple *mNtuple;
   std::vector < StMixerEvent > mEvents; //Needs to be generalized to more categories Using TCLones array
 
   unsigned short int mEventsBuffer; 
