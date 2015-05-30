@@ -25,7 +25,9 @@
 #include "StMixerTrack.h"
 #include "StMixerPair.h" 
 #include "TH1.h"
-#include "TNtuple.h"
+#include "TTree.h"
+#include "StMemStat.h"
+
 class StPicoEvent;
 class StPicoTrack;
 class StPicoDst;
@@ -40,7 +42,6 @@ class StPicoEventMixer {
   StPicoEventMixer();
   ~StPicoEventMixer(){;};
   bool addPicoEvent(const StPicoDst *picoDst, StHFCuts *mHFCuts);
-  StMixerTrack * makeMixerTrack(StPicoTrack const * , bool, bool, bool, bool);
   void setEventBuffer(int buffer);
   void mixEvents(StHFCuts *mHFCuts);
   void InitMixedEvent();
@@ -49,13 +50,14 @@ class StPicoEventMixer {
   void fill(StMixerPair const * const);
   bool isMixerPion(StMixerTrack);
   bool isMixerKaon(StMixerTrack);
-  TH1F * mBackground;
-  TNtuple *mNtuple;
-  std::vector < StMixerEvent > mEvents; //Needs to be generalized to more categories Using TCLones array
-
+  //TH1F * mBackground;
+  TTree * ntp_ME;
+  std::vector < StMixerEvent *> mEvents; //Needs to be generalized to more categories Using TCLones array
+  StMemStat mem;
   unsigned short int mEventsBuffer; 
   unsigned short int filledBuffer;
-  
+  float dca1, dca2, dcaDaughters, theta_hs, decayL_hs;
+  float pt_hs, mass_hs, eta_hs, phi_hs;
 
 };
 
