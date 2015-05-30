@@ -25,6 +25,7 @@
 #include "StMixerTrack.h"
 #include "StMixerPair.h" 
 #include "TH1.h"
+#include "TTree.h"
 #include "StMemStat.h"
 
 class StPicoEvent;
@@ -49,12 +50,14 @@ class StPicoEventMixer {
   void fill(StMixerPair const * const);
   bool isMixerPion(StMixerTrack);
   bool isMixerKaon(StMixerTrack);
-  TH1F * mBackground;
+  //TH1F * mBackground;
+  TTree * ntp_ME;
   std::vector < StMixerEvent *> mEvents; //Needs to be generalized to more categories Using TCLones array
   StMemStat mem;
   unsigned short int mEventsBuffer; 
   unsigned short int filledBuffer;
-  
+  float dca1, dca2, dcaDaughters, theta_hs, decayL_hs;
+  float pt_hs, mass_hs, eta_hs, phi_hs;
 
 };
 

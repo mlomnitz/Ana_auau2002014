@@ -18,12 +18,29 @@ StPicoEventMixer::StPicoEventMixer(): mEvents(), mEventsBuffer(std::numeric_limi
   return;
 }
 void StPicoEventMixer::InitMixedEvent(){
-  setEventBuffer(11);
-  mBackground = new TH1F("bgMass","Mixed Event Invariant mass",100,0,5);
+  setEventBuffer(3);
+  //mBackground = new TH1F("bgMass","Mixed Event Invariant mass",500,0,5);
+  int BufSize = (int)pow(2., 16.);
+  //ntp_ME = new TNtuple("ntp_ME","MixedEvent Tree","dca1:dca2:dcaDaughters:"		       
+  //"theta_hs:decayL_hs:pt_hs:mass_hs:eta_hs:phi_hs:",BufSize);
+  ntp_ME = new TTree("ntp_ME","MixedEvent",BufSize);
+  ntp_ME ->SetAutoSave(1000000);
+  ntp_ME->Branch("dca1",&dca1,"dca1/F");
+  ntp_ME->Branch("dca1",&dca2,"dca2/F");
+  ntp_ME->Branch("dcaDaughters",&dcaDaughters,"dcaDaughters/F");
+  ntp_ME->Branch("theta_hs",&theta_hs,"theta_hs/F");
+  ntp_ME->Branch("decayL_hs",&decayL_hs,"decayL_hs/F");
+  ntp_ME->Branch("pt_hs",&pt_hs,"pt_hs/F");
+  ntp_ME->Branch("mass_hs",&mass_hs,"mass_hs/F");
+  ntp_ME->Branch("eta_hs",&eta_hs,"eta_hs/F");
+  ntp_ME->Branch("phi_hs",&phi_hs,"phi_hs/F");
+
   return;
 }
 void StPicoEventMixer::FinishMixedEvent(){
-  mBackground -> Write();
+  //mBackground -> Write();
+  //ntp_ME->Write("anyName",TObject::kSingleKey);
+  ntp_ME->Write();
   return;
 }
 bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst, StHFCuts *mHFCuts)
@@ -47,6 +64,7 @@ bool StPicoEventMixer::addPicoEvent(const StPicoDst * picoDst, StHFCuts *mHFCuts
       isTpcK = true;
       isTofK = true;
     }
+    if(!isTpcK && !isTpcPi) continue;
     StMixerTrack *mTrack = new StMixerTrack(trk, isTpcPi, isTofPi, isTpcK, isTofK);
     Event->addTrack(mTrack);
     delete mTrack;
@@ -125,6 +143,17 @@ bool StPicoEventMixer::isMixerKaon(StMixerTrack track){
 }
 // _________________________________________________________
 void StPicoEventMixer::fill(StMixerPair const * const pair){
-  mBackground -> Fill(pair->m());
+  //mBackground -> Fill(pair->m());
+  
+  dca1 = pair->particle1Dca();
+  dca2 = pair->particle1Dca();
+  dcaDaughters = pair->dcaDaughters();
+  theta_hs = pair->pointingAngle();
+  decayL_hs = pair->decayLength();
+  pt_hs = pair->pt();
+  mass_hs = pair->m();
+  eta_hs = pair->eta();
+  phi_hs = pair->phi();
+  ntp_ME->Fill();
   return;
 }

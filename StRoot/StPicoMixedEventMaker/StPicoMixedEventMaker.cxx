@@ -34,7 +34,7 @@ StMaker(name), mPicoDst(NULL), mPicoDstMaker(picoMaker),  mPicoEvent(NULL),
   int Split = 1;
   if (!mTree) 
     mTree = new TTree("T", "T", BufSize);
-  mTree->SetAutoSave(1000000); // autosave every 1 Mbytes
+  // mTree->SetAutoSave(1000000); // autosave every 1 Mbytes
   //  mTree->Branch("mixedEvent", "StPicoMixedEvent", &mPicoEventMixer, BufSize, Split);
   
   // -- constructor

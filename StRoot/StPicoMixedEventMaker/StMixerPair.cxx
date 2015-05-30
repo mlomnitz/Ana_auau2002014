@@ -52,8 +52,11 @@ StMixerPair::StMixerPair(StMixerTrack const * const particle1, StMixerTrack cons
   // -- use straight lines approximation to get point of DCA of particle1-particle2 pair
   StThreeVectorF const p1Mom = p1Helix.momentum(bField * kilogauss);
   StThreeVectorF const p2Mom = p2Helix.momentum(bField * kilogauss);
-  StPhysicalHelixD const p1StraightLine(p1Mom, p1Helix.origin(), 0, particle1->charge());
-  StPhysicalHelixD const p2StraightLine(p2Mom, p2Helix.origin(), 0, particle2->charge());
+  StPhysicalHelixD const p1StraightLine = p1Helix;
+  StPhysicalHelixD const p2StraightLine = p2Helix;
+  
+  //StPhysicalHelixD const p1StraightLine(p1Mom, p1Helix.origin(), 0, particle1->charge());
+  //StPhysicalHelixD const p2StraightLine(p2Mom, p2Helix.origin(), 0, particle2->charge());
 
   pair<double, double> const ss = p1StraightLine.pathLengths(p2StraightLine);
   StThreeVectorF const p1AtDcaToP2 = p1StraightLine.at(ss.first);
