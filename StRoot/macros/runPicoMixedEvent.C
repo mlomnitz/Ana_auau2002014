@@ -122,7 +122,7 @@ void runPicoMixedEvent(const Char_t *inputFile="test.list", const Char_t *output
   cout << " Total entries = " << total << endl;
   if(nEvents>total) nEvents = total;
   for (Int_t i=0; i<nEvents; i++) {
-    if(i%10==0)
+    if(i%1==0)
       cout << "Working on eventNumber " << i << endl;
     
     chain->Clear();
