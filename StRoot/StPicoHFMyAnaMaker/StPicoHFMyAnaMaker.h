@@ -2,7 +2,7 @@
 #define StPicoHFMyAnaMaker_h
 
 #include "StPicoHFMaker/StPicoHFMaker.h"
-
+#include "TNtuple.h"
 /* **************************************************
  *  Sample class fo HF picoDST analysis
  * --------------------------------------------------
@@ -96,7 +96,7 @@ class StPicoHFMyAnaMaker : public StPicoHFMaker
   unsigned int mDecayChannel;
 
   // -- ADD USER MEMBERS HERE ------------------- 
-
+  TNtuple *ntp_DMeson;
 
 
 
